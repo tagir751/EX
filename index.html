@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Шпаргалка реализатора | Соната-Крым</title>
 <style>
-/* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -16,11 +15,7 @@ body {
   line-height: 1.65;
   font-size: 15px;
 }
-
-/* ===== LAYOUT ===== */
 .wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
-
-/* ===== HEADER ===== */
 .header {
   background: linear-gradient(135deg, #1a3a5c 0%, #2a5a7c 100%);
   color: #fff;
@@ -35,41 +30,31 @@ body {
   background: #d4a843; color: #1a3a5c; padding: 6px 18px; border-radius: 20px;
   font-weight: 700; font-size: 13px; white-space: nowrap;
 }
-
-/* ===== NAV / CATEGORIES ===== */
-.cat-nav {
-  background: #fff; border-bottom: 1px solid #e0d8cf; position: sticky; top: 0; z-index: 50;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.cat-nav .wrap {
-  display: flex; flex-wrap: wrap; gap: 4px; padding-top: 10px; padding-bottom: 10px;
-}
-.cat-nav button {
-  background: transparent; border: 1px solid #d0c8bc; border-radius: 20px; padding: 5px 14px;
-  font-size: 12.5px; cursor: pointer; color: #555; transition: all 0.15s; white-space: nowrap;
-}
-.cat-nav button:hover { border-color: #1a3a5c; color: #1a3a5c; }
-.cat-nav button.active { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
-
-/* ===== КНОПКА-БУРГЕР (слева) ===== */
-.hamburger {
-  position: fixed; left: 16px; top: 50%; transform: translateY(-50%); z-index: 100;
-  width: 48px; height: 48px; border-radius: 50%; border: none;
+.hamburger-left {
+  position: fixed; left: 16px; top: 16px; z-index: 100;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
   background: #1a3a5c; color: #fff; font-size: 20px; cursor: pointer;
   box-shadow: 0 4px 14px rgba(26,58,92,0.35);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-.hamburger:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 6px 20px rgba(26,58,92,0.45); }
-.hamburger:active { transform: translateY(-50%) scale(0.95); }
-
-/* ===== ШТОРКА (drawer) ===== */
+.hamburger-left:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(26,58,92,0.45); }
+.hamburger-left:active { transform: scale(0.95); }
+.hamburger-right {
+  position: fixed; right: 16px; top: 16px; z-index: 100;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: #1a3a5c; color: #fff; font-size: 20px; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(26,58,92,0.35);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hamburger-right:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(26,58,92,0.45); }
+.hamburger-right:active { transform: scale(0.95); }
 .drawer-overlay {
   position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35);
   opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s;
 }
 .drawer-overlay.open { opacity: 1; visibility: visible; }
-
 .drawer {
   position: fixed; top: 0; left: 0; bottom: 0; z-index: 201;
   width: 320px; max-width: 85vw;
@@ -78,24 +63,28 @@ body {
   display: flex; flex-direction: column;
 }
 .drawer.open { transform: translateX(0); }
-
+.drawer-right {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: 320px; max-width: 85vw;
+  background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex; flex-direction: column;
+}
+.drawer-right.open { transform: translateX(0); }
 .drawer-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 16px 12px; border-bottom: 1px solid #eee; flex-shrink: 0;
 }
 .drawer-header h2 { font-size: 17px; font-weight: 700; color: #1a3a5c; }
 .drawer-close {
-  background: none; border: none; font-size: 22px; cursor: pointer; color: #999; padding: 4px;
-  line-height: 1;
+  background: none; border: none; font-size: 22px; cursor: pointer; color: #999; padding: 4px; line-height: 1;
 }
 .drawer-close:hover { color: #333; }
-
 .drawer-list {
   flex: 1; overflow-y: auto; padding: 8px 10px;
 }
 .drawer-list::-webkit-scrollbar { width: 4px; }
 .drawer-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-
 .drawer-list button {
   display: block; width: 100%; text-align: left; background: transparent; border: none;
   border-radius: 6px; padding: 10px 12px; font-size: 13.5px; cursor: pointer; color: #333;
@@ -107,29 +96,30 @@ body {
   display: inline-block; font-size: 10px; background: #eee; color: #777; border-radius: 4px;
   padding: 1px 6px; margin-left: 4px;
 }
-
-/* ===== CONTENT ===== */
+.cat-filter-btn {
+  display: block; width: 100%; text-align: left; background: transparent; border: none;
+  border-radius: 6px; padding: 10px 12px; font-size: 14px; cursor: pointer; color: #333;
+  transition: all 0.12s; line-height: 1.3;
+}
+.cat-filter-btn:hover { background: #f0ebe4; }
+.cat-filter-btn.active { background: #1a3a5c; color: #fff; font-weight: 600; }
 .main { padding-top: 24px; padding-bottom: 60px; }
 .content-placeholder {
   background: #fff; border-radius: 10px; border: 1px solid #e8e0d6; padding: 80px 40px; text-align: center;
   color: #aaa; font-size: 16px;
 }
 .content-placeholder strong { color: #888; }
-
-/* ===== EXCURSION CARD ===== */
 .card {
   background: #fff; border-radius: 10px; border: 1px solid #e8e0d6; padding: 32px 36px; display: none;
 }
 .card.visible { display: block; animation: fadeUp 0.25s ease; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 .card h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; color: #1a3a5c; }
 .card .meta {
   display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; padding-bottom: 18px;
   border-bottom: 2px solid #f0ebe4; font-size: 13px; color: #666;
 }
 .card .meta span { background: #f5f1ec; padding: 4px 12px; border-radius: 16px; }
-
 .card h3 {
   font-size: 17px; font-weight: 600; margin: 28px 0 10px; color: #1e3a5c; padding-bottom: 4px;
   border-bottom: 1px solid #eee;
@@ -147,19 +137,17 @@ body {
   background: #fef9e7; border-left: 4px solid #d4a843; padding: 12px 18px; margin: 16px 0; border-radius: 0 6px 6px 0;
 }
 .card .highlight strong { color: #b8860b; }
-
-/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .hamburger { left: 10px; width: 42px; height: 42px; font-size: 17px; }
-  .drawer { width: 85vw; }
+  .hamburger-left, .hamburger-right { width: 42px; height: 42px; font-size: 17px; }
+  .hamburger-left { left: 10px; }
+  .hamburger-right { right: 10px; }
+  .drawer, .drawer-right { width: 85vw; }
   .card { padding: 20px; }
   .header .wrap { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
 <body>
-
-<!-- ===== HEADER ===== -->
 <div class="header">
   <div class="wrap">
     <div>
@@ -169,30 +157,8 @@ body {
     <div class="badge">⚡ 50 экскурсий</div>
   </div>
 </div>
-
-<!-- ===== КАТЕГОРИИ ===== -->
-<div class="cat-nav" id="catNav">
-  <div class="wrap">
-    <button class="active" data-cat="all">🏁 Все</button>
-    <button data-cat="yugo-vostok">🌊 Юго-Восток</button>
-    <button data-cat="obzornye">🌄 Обзорные</button>
-    <button data-cat="dvortsy">🏰 Дворцы &amp; ЮБК</button>
-    <button data-cat="aktiv">🏔 Активные</button>
-    <button data-cat="peshery">🕯️ Пещеры</button>
-    <button data-cat="vinnye">🍷 Винные</button>
-    <button data-cat="palomnicheskie">⛪ Паломнические</button>
-    <button data-cat="zapad">🏖 Западный Крым</button>
-    <button data-cat="sevastopol">⚓ Севастополь</button>
-    <button data-cat="kerch">🏛 Керчь</button>
-    <button data-cat="semejnye">🐾 Семейные</button>
-    <button data-cat="fototur">📸 Фототуры</button>
-  </div>
-</div>
-
-<!-- ===== КНОПКА-БУРГЕР ===== -->
-<button class="hamburger" id="hamburgerBtn" title="Список экскурсий">☰</button>
-
-<!-- ===== ШТОРКА ===== -->
+<button class="hamburger-left" id="hamburgerLeft" title="Список экскурсий">☰</button>
+<button class="hamburger-right" id="hamburgerRight" title="Фильтр по категориям">◎</button>
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -201,19 +167,22 @@ body {
   </div>
   <div class="drawer-list" id="drawerList"></div>
 </div>
-
-<!-- ===== MAIN ===== -->
+<div class="drawer-overlay" id="drawerOverlayRight"></div>
+<div class="drawer-right" id="drawerRight">
+  <div class="drawer-header">
+    <h2>🏷️ Категории</h2>
+    <button class="drawer-close" id="drawerCloseRightBtn">✕</button>
+  </div>
+  <div class="drawer-list" id="drawerCatList"></div>
+</div>
 <div class="main wrap" id="content">
   <div class="content-placeholder" id="placeholder">
     <div style="font-size: 48px; margin-bottom: 16px;">👆</div>
     <strong>Выберите экскурсию</strong> из списка слева,<br>чтобы увидеть полное описание, фишки и рекомендации
   </div>
 </div>
-
 <script>
-// ===== ДАННЫЕ =====
 const excursions = [];
-
 function add(id, title, cat, emoji, data) {
   excursions.push({ id, title, cat, emoji, ...data });
 }
@@ -436,8 +405,6 @@ add('puteshestvie', 'Путешествие во времени', 'yugo-vostok',
 </ul>`
 });
 
-// ===== ВИННЫЕ ТУРЫ =====
-
 add('vinny-sd', 'Винный тур Солнечная Долина', 'vinnye', '🍷', {
   time: '⏰ 14:00–18:00 · Полдня (4 ч)',
   price: '💰 500₽ проезд + 1800₽ дегустация',
@@ -481,6 +448,8 @@ add('vinny-sd', 'Винный тур Солнечная Долина', 'vinnye',
 <li>⏰ 14:00–18:00 — идеально для второй половины дня.</li>
 </ul>`
 });
+
+// ===== ВИННЫЕ ТУРЫ =====
 
 add('massandra', 'Винный тур Массандра блюз', 'vinnye', '🍇', {
   time: '⏰ ~14:00–19:00 · Полдня',
@@ -770,6 +739,174 @@ add('tri-dvorca', 'Три дворца (Корона ЮБК)', 'dvortsy', '👑'
 </ul>`
 });
 
+// ===== НОВЫЕ ЭКСКУРСИИ =====
+
+add('krymskie-maldivy', 'Крымские Мальдивы — Розовое озеро, Евпатория, Атлеш', 'zapad', '🌴', {
+  time: '⏰ 12–13 часов',
+  price: '💰 ~1500–1600₽ + допы (катер 700–800₽, обед)',
+  type: '🏖 Обзорная · Западный Крым',
+  desc: `<p>Путешествие на запад Крыма — к розовому озеру Сасык-Сиваш, историческому центру Евпатории («Малый Иерусалим»), скалам Большого Атлеша и пляжу «Белая жемчужина» с белым песком-ракушечником. 300 км через горы — Старый Крым, Грушевка, Топловский монастырь. Не просто экскурсия, а территория релакса, гармонии и уникальной природы.</p>`,
+  why: `<ul>
+<li>«<strong>Самое большое разнообразие за один день</strong>» — розовое озеро (крупнейшее в Крыму, 70x14 км), средневековый Малый Иерусалим, скалы 60–90 м, белый песок как на Мальдивах.</li>
+<li>Евпатория — люди выходят в восторге, влюбляются в город за 1.5 часа. Красивые трамвайчики, набережная Терешковой.</li>
+<li>Большой Атлеш — катер с харизматичными капитанами (юмор, стихи). Бабушка вышла, руки раскинула: «Это божественно». Незаконченный храм Николаю Чудотворцу.</li>
+<li>Пляж «Белая жемчужина» — белый мягкий песок (ракушечка растёрлась), не смыть, бесплатный душ и туалет.</li>
+<li>Розовое озеро Сасык-Сиваш — можно купить пищевую соль и соль для обтирания.</li>
+<li>Обед в кафе — готовят как дома, цена адекватная, очень сытно. Единственное место на маршруте с нормальным обедом.</li>
+<li>Возвращаются бодрячком, не уставшие — Евпатория, Ялта-Севастополь, Феодосия уже позади, на обратном пути свободные люди.</li>
+</ul>`,
+  hooks: `<ol>
+<li><strong>Розовое озеро Сасык-Сиваш</strong> — крупнейшее розовое озеро Крыма, 70 км в длину, 14 в ширину. Уникальный цвет воды. Соль пищевая и косметическая — купить с собой.</li>
+<li><strong>Малый Иерусалим (Евпатория)</strong> — исторический центр за 1.5 часа. Восторг гарантирован. Трамвайчики — туристы «в шоке» от их красоты. Набережная Терешковой.</li>
+<li><strong>Катер у Большого Атлеша</strong> — скалы 60–90 м, капитаны с юмором. Если нет катера — больше времени на купание.</li>
+<li><strong>Белый песок — «наши Мальдивы»</strong> — ракушечка растёрлась в муку, мягкая, не смывается с тела. Пляж «Белая жемчужина».</li>
+<li><strong>Храм Николаю Чудотворцу</strong> — незаконченный, но уже впечатляющий, на скалах Атлеша.</li>
+</ol>`,
+  sell: `<blockquote>«За один день вы увидите розовое озеро, проедетесь на трамвайчике по древней Евпатории, пройдёте по скалам Большого Атлеша, прокатитесь на катере с легендарными капитанами и искупаетесь на пляже с белым песком. Это не просто экскурсия — это территория релакса и гармонии. Розовое озеро, Малый Иерусалим, катер, купание — самый насыщенный день в Крыму».</blockquote>`,
+  tourist: `<ul>
+<li>Удобная обувь — много пешей части (Евпатория, Атлеш).</li>
+<li>Шапочка и вода обязательны — открытая территория, солнце.</li>
+<li>Ветровка — западный Крым, открытая местность, может быть ветрено.</li>
+<li>Купальник с собой — купание на пляже «Белая жемчужина».</li>
+<li>Для детей уточнять про катер (проводник уточняет на момент бронирования).</li>
+<li>Допы: катер ~700–800₽, обед (~400–500₽), соль с розового озера.</li>
+</ul>`,
+  org: `<ul>
+<li>Название «Крымские Мальдивы» — <strong>не акцентировать</strong>. Люди ждут Мальдивы, получают Крым, отсюда претензии. Продавать как «территория релакса, гармонии, уникальности»: розовое озеро, Евпатория, катер, купание.</li>
+<li>Дорога идёт через Старый Крым, Грушевку, Топловский монастырь — горы, а не степь. Впечатлений много, люди не устают психологически.</li>
+<li>Гид берёт с собой карту и в Евпатории показывает, откуда проехали и куда поедут — убирает ощущение «огромности» маршрута.</li>
+<li>Конкуренты в этом году тоже завозят в Евпаторию, но изюминка Наташи — своё время, никуда не спешат.</li>
+<li>Мощь экскурсии — в разнообразии: розовое озеро + Евпатория + катер + пляж. Не фокусироваться на конечной точке.</li>
+<li>Участок земли 6 соток рядом с пляжем стоит 9 млн — показать ценность места.</li>
+<li>Душ и туалет на пляже бесплатные — комфорт для туристов.</li>
+</ul>`
+});
+
+add('kimmeriyskie-berega', 'Киммерийские берега', 'aktiv', '🏝️', {
+  time: '⏰ 7:00–17:00 / 19:00 (полный день)',
+  price: '💰 от 500₽ + катер (Новый Свет) + тарзанка (озеро Панагия)',
+  type: '🏔 Полный день · Юго-Восток / Активный',
+  desc: `<p>Путешествие по названию от Волошина — он называл Киммерией юго-восточный Крым: Коктебель, Новый Свет, Судак. Маршрут: Феодосия → Новый Свет → Зеленогорье → Морское. 4 купания за день — в море, в бухте, в реке, в озере. Первая часть — тропа Голицына в Новом Свете: идут по поверхности, спускаются в Голубую бухту на Царский пляж. Выезд в 7 утра, чтобы в 10 быть на пляже — никого нет, море тихое и спокойное. Проходят Можжевеловой рощей — километр красивым спуском, незаметно. Потом катер из Голубой бухты объезжает бухточки, капитаны рассказывают, привозят в Зелёную бухту (Новый Свет), там обед. После — по Южной дороге в Зеленогорье: Арпатские каскады, река Арпат (в древности Пананья-Узень — «Святая вода»). Купаются в ванночках, «водичка снимает негатив». Озеро Панагия — зелёно-голубое, святое место, тарзанка через озеро (платная, 1.5 часа). Обратно — остановка в Морском, купание в море. Экскурсия нетяжёлая, но очень эмоциональная и мощная.</p>`,
+  why: `<ul>
+<li>«<strong>Царский пляж в 10 утра без людей</strong>» — Голубая бухта, тихое море, ни души. Ранний выезд окупается ощущением, что весь пляж твой.</li>
+<li><strong>Можжевеловая роща</strong> — красивейший спуск, километр-двести, идёшь и не замечаешь. Тишина, запах можжевельника, «такая тишина, такая красота».</li>
+<li><strong>4 купания за один день</strong> — в море, в Голубой бухте, в Арпатских каскадах, в озере Панагия. «И в бухте купаются, и в море купаются, и в озере, и в речке».</li>
+<li><strong>Святая вода</strong> — река Арпат (Пананья-Узень — «Святая вода»). Люди кричат, что «водичка снимает весь негатив». Практически все участвуют.</li>
+<li><strong>Тарзанка через озеро Панагия</strong> — зелёно-голубое святое озеро. Прыжок — отдельное удовольствие. Рядом пирожки, фрукты, овощи.</li>
+</ul>`,
+  hooks: `<ol>
+<li><strong>Царский пляж (Голубая бухта)</strong> — дикий пляж в Новом Свете, закрытый для свободного посещения. Только с экскурсией. В 10 утра — пустой.</li>
+<li><strong>Тропа Голицына</strong> — легендарный маршрут вдоль скал над морем, вырубленный для князя Голицына.</li>
+<li><strong>Голубая бухта</strong> — невероятный цвет воды, «нет людей, море тихое, спокойное».</li>
+<li><strong>Катер с капитанами</strong> — объезд бухточек, капитаны рассказывают, показывают, везут в Зелёную бухту. Не просто трансфер — часть приключения.</li>
+<li><strong>Арпатские каскады</strong> — каскады на реке Арпат, природные ванночки. В древности — «Святая вода» (Пананья-Узень).</li>
+<li><strong>Озеро Панагия</strong> — зелёно-голубое, святое место. Второе место в Крыму, где водятся чёрные грифы (редко пролетают).</li>
+<li><strong>Тарзанка через озеро</strong> — платная, 1.5 часа. Прыжок в святое озеро — эмоций на год вперёд.</li>
+<li><strong>Чёрные грифы</strong> — редкие птицы, занесённые в Красную книгу. Можно увидеть пролетающими над озером.</li>
+<li><strong>Можжевеловая роща</strong> — реликтовая роща можжевельника с целебным воздухом. Спуск незаметный, красивый.</li>
+</ol>`,
+  sell: `<blockquote>«Хотите за один день искупаться четыре раза — в море, в бухте, в реке и в озере? Выезжаем в 7 утра, к 10 утра мы на Царском пляже — одни, без толп. Можжевеловая роща, тропа Голицына, катер с рассказами, потом Арпатские каскады — там вода снимает негатив, говорят. Озеро Панагия — святое место, зелёно-голубое, тарзанка через него. Возвращаемся через Морское — ещё одно купание. 4 купания, полный день впечатлений. Экскурсия — огонь».</blockquote>`,
+  tourist: `<ul>
+<li>⏰ Ранний выезд — 7 утра. Это чтобы попасть на Царский пляж без людей. Потом обед, каскады, озеро — день насыщенный.</li>
+<li>👟 Удобная обувь — тропа Голицына, спуск к пляжу, каскады. Не шлёпки, не каблуки.</li>
+<li>🩱 Купальник — 4 купания за день. Полотенце, смена белья.</li>
+<li>💧 Вода с собой — обязательно. На маршруте будет где купить, но лучше взять.</li>
+<li>🧢 Шапочка от солнца — полный день на открытом воздухе.</li>
+<li>💵 Наличные — катер (дополнительно), тарзанка на озере, еда, пирожки, фрукты.</li>
+</ul>`,
+  org: `<ul>
+<li>🐚 Экскурсию «похерила» одна экскурсовод — поссорилась с катерщиками и сказала, что не набирается. На деле экскурсия идёт «на ура». Восстанавливаем.</li>
+<li>🏊 4 купания за экскурсию: Голубая бухта (Царский пляж), Арпатские каскады / озеро Панагия, море в Морском. Много воды — клиенты в восторге.</li>
+<li>🛣️ Дорога через серпантин — утром гид не знает, как поедет. Всё зависит от моря. Если шторм — сначала Зеленогорье, потом Новый Свет.</li>
+<li>🌤️ Гибкий маршрут от погоды — последовательность может меняться. Клиентов предупреждать.</li>
+<li>🏖️ Позиционировать как оздоровительную (между собой).</li>
+<li>⏱️ Время возврата — 17–19 часов, зависит от погоды и настроения группы.</li>
+</ul>`
+});
+
+add('sakralny-krym', 'Сакральный Крым (Крымское вдохновение)', 'aktiv', '☀️', {
+  time: '⏰ 12–13 часов (выезд в 7:00)',
+  price: '💰 500₽ + входы (скидка водителю, чаевые гиду приветствуются)',
+  type: '🏔 Активная · Сакральная · Оздоровительная',
+  desc: `<p>Путешествие, которое пробуждает чувства. Маршрут соединяет сакральные, природные и исторические места юго-западного Крыма: гора Крокодил, Мангупское озеро, Ласпинский перевал, часовня Рождества Христова, Храм Солнца, Байдарские ворота, Скельская пещера, ландшафтный парк. Подъём к Храму Солнца — ключевая часть маршрута: полтора часа вверх через красивый лес с источником воды. Экскурсия мощнейшая, оздоровительная — после неё не устаёшь, как будто 20 минут прошло. В программе: обед в единственном кафе Бахчисарая (экологично, цены адекватные), час купания на море у Фороса, чебуреки.</p>`,
+  why: `<ul>
+<li>«<strong>Путешествие, которое пробуждает чувства</strong>» — природа, энергия, тишина. Со всеми стихиями пообщаетесь — солнечной, водной, землёй.</li>
+<li><strong>Храм Солнца</strong> — группа скал-пальцев на вершине. Место силы с невероятной энергетикой. Гид Наташа берёт тибетскую чашу — «звучит» на Храме Солнца.</li>
+<li><strong>Гора Крокодил</strong> — скала-крокодил с видом на Бельбекскую долину и Бельбекские ворота. Эффектные фото.</li>
+<li><strong>Форосский парк Кузнецова</strong> + час у моря с купанием — отдых, снятие напряжения, чебуреки и пицца.</li>
+<li><strong>Скельская пещера</strong> — одна из красивейших по натёчным образованиям. Самая тёплая (14–15 °C). Выдают кофты. Полянка с тропинкой-массажем.</li>
+<li><strong>Менгиры</strong> — высокие камни возрастом 4000 лет. Место, где йоги любят медитировать.</li>
+</ul>`,
+  hooks: `<ol>
+<li><strong>Храм Солнца с тибетской чашей</strong> — подъём через красивый лес, источник воды. На вершине — каменные пальцы. Гид «звучит» на тибетской чаше.</li>
+<li><strong>Гора Крокодил</strong> — скала-крокодил, Бельбекская долина, Бельбекские ворота.</li>
+<li><strong>Форосский парк Кузнецова</strong> — прогулка, час у моря, купание. Чебуреки, пицца. Форосский храм.</li>
+<li><strong>Скельская пещера</strong> — натёчные образования, одна из красивейших в Крыму. Тропинка-массаж для босых ног.</li>
+<li><strong>Менгиры — 4000 лет</strong> — не Стоунхендж, но... Высокие камни, загадочная энергия.</li>
+<li><strong>Энергии и стихии</strong> — «Если человек в теме с энергиями, ему такие места хочется посетить».</li>
+<li><strong>Бабуля с астмой поднялась</strong> — реальная история: пожилая женщина с астмой спокойно поднялась на Храм Солнца.</li>
+</ol>`,
+  sell: `<blockquote>«Самая оздоровительная экскурсия Крыма. Поднимаемся на Храм Солнца — место силы с невероятной энергетикой. Идти полтора часа через лес, но время пролетает незаметно. Вы не замечаете усталости — как будто 20 минут прошло. Ещё гора Крокодил, Мангупское озеро, Скельская пещера, менгиры 4000 лет и час купания в море. 12 часов — и вы совершенно новый человек. Даже бабушка с астмой поднялась — настолько лёгкий подъём».</blockquote>`,
+  tourist: `<ul>
+<li>Лёгкий рюкзак — только бутылка воды и перекус. Никаких тяжёлых сумок.</li>
+<li>Удобная обувь (кроссовки/треккинг) — подъём к Храму Солнца.</li>
+<li>Вода 1–1.5 л и что-то перекусить (основной обед в Бахчисарае).</li>
+<li>Кофта — в Скельской пещере 14–15 °C (выдают, но своя не помешает).</li>
+<li>Купальник — час купания на море у Фороса.</li>
+<li>Если есть треккинговые палки — брать.</li>
+<li>Дети с 7 лет. «И с собаками ходят, и бабки 90-летние».</li>
+</ul>`,
+  org: `<ul>
+<li>Продавать правильно — акцент на Храм Солнца, НО не пугать цифрами. Не говорите «подъём 3 часа».</li>
+<li>Храм Солнца лучше в будни (вторник, понедельник) — в выходные толпы народу.</li>
+<li>Ужина в Бахчисарае нет — только обед.</li>
+<li>Выезд в 7 утра. Остановка на заправке. Обед в кафе Бахчисарая.</li>
+<li>Возвращение ~22:00. Учитывать при планировании.</li>
+<li>Скрипт: «Вы подойдёте к Храму Солнца. Возьмите лёгкий рюкзачок, бутылочку воды и что-то перекусить».</li>
+</ul>`
+});
+
+add('zavtrak-u-zufara', 'Завтрак у Зуфара (Гастро-тур)', 'semejnye', '🍳', {
+  time: '⏰ Полдня',
+  price: '💰 500₽ + питание (оплачивается отдельно)',
+  type: '🐾 Гастрономическая · Оздоровительная',
+  desc: `<p>Поездка в уникальное место в Белогорском районе, в село Красносёловка, где в глубине горного разлома живёт и принимает гостей Зуфар — удивительный человек из Башкирии, приехавший в Крым в 1994 году. Он построил на своей земле «Семь вершин» — место силы, форелевое хозяйство и философское пространство, где каждый может восстановить свою энергию.</p><p>В программе: встреча с Зуфаром, который играет на бубнах и беседует с гостями о здоровье, энергии и «древней азбуке», обед из экологически чистой форели (собственное хозяйство), фирменные сырники («таких вы нигде не найдёте»), яичница, потрясающий травяной чай и великолепный мёд. На обратном пути — заезд к Дубу Суворова, чтобы загадать желание.</p>`,
+  why: `<ul>
+<li>Уникальная форель — экологически чистая, корм только свой, курочки свои. Невероятно вкусная.</li>
+<li>Сырники, которых больше нигде нет — секретный рецепт. Травяной чай и мёд — отдельный восторг.</li>
+<li>Личное общение с Зуфаром — можно задать любой вопрос, он ответит. Философия, энергия, глубина.</li>
+<li>Место силы — разлом в горе, Крым в разрезе напоминает гриб, где из «ножки» идёт мощный поток позитивной энергии.</li>
+<li>Дуб Суворова — загадать желание, сфотографироваться, зарядиться.</li>
+<li>Маленькая, но прекрасная баня.</li>
+</ul>`,
+  hooks: `<ol>
+<li><strong>Зуфар — хранитель энергии</strong>. Приехал из Башкирии в 1994, нашёл место в разломе, построил «Семь вершин».</li>
+<li><strong>Разлом в горе</strong> — место выхода мощной позитивной энергии.</li>
+<li><strong>Форелевое хозяйство</strong> — только свой корм, свои курочки. Фермерская, чистая, невероятно вкусная рыба.</li>
+<li><strong>Сырники «нигде таких нет»</strong> — настоящий гастрономический хит.</li>
+<li><strong>Чай из травок + мёд</strong> — «потрясающий» и «великолепный» по отзывам.</li>
+<li><strong>Дуб Суворова</strong> — остановка на обратном пути, чтобы загадать желание и сделать памятные фото.</li>
+<li><strong>Баня</strong> — маленькая, но прекрасная. Отдельный релакс.</li>
+<li><strong>Любой вопрос — любой ответ</strong>. Зуфар не рекламирует себя.</li>
+</ol>`,
+  sell: `<blockquote>«Полдня в месте силы. Вы едете в горный разлом к человеку, который восстановит вашу энергию, накормит форелью из собственного хозяйства и такими сырниками, каких вы в жизни не пробовали. Травяной чай, мёд, разговоры по душам, бубны Зуфара. А на обратном пути — Дуб Суворова, загадать желание. Это не экскурсия — это возвращение домой».</blockquote>`,
+  tourist: `<ul>
+<li>🧢 Удобная одежда и обувь — дорога в разлом 17 км от трассы, будет прогулка.</li>
+<li>😊 Хорошее настроение и открытость — здесь важно общение.</li>
+<li>💬 Приготовьте вопросы Зуфару — он отвечает на любые, от здоровья до философии.</li>
+<li>📸 Фотоаппарат — Дуб Суворова, виды разлома, уютная атмосфера.</li>
+<li>🥘 Питание оплачивается отдельно — форель, сырники, чай, мёд. Берите наличные на продукты (сало, мясо, яйца — можно купить с собой).</li>
+</ul>`,
+  org: `<ul>
+<li>📌 Экскурсия в разработке — уточняйте детали и наличие перед продажей.</li>
+<li>⏳ Полудневная — небольшая по времени, но насыщенная эмоциями.</li>
+<li>🧘 Рекомендовать только тем, кому это действительно интересно — энергия, оздоровление, философия.</li>
+<li>👥 Зуфар принимает лично — группы небольшие, камерная атмосфера.</li>
+<li>💰 Цена 500₽ — плюс питание отдельно (форель, сырники, чай, мёд и продукты на выкуп).</li>
+<li>🚗 Заезд к Дубу Суворова на обратном пути — фотографироваться, загадывать желания.</li>
+</ul>`
+});
+
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 
 function esc(t) {
@@ -831,14 +968,27 @@ function closeDrawer() {
   document.body.style.overflow = '';
 }
 
+function openDrawerRight() {
+  document.getElementById('drawerRight').classList.add('open');
+  document.getElementById('drawerOverlayRight').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawerRight() {
+  document.getElementById('drawerRight').classList.remove('open');
+  document.getElementById('drawerOverlayRight').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
   const drawerList = document.getElementById('drawerList');
+  const drawerCatList = document.getElementById('drawerCatList');
   const content = document.getElementById('content');
   const placeholder = document.getElementById('placeholder');
 
   // Сортируем
-  const detailIds = ['sudak-ns', 'automorskoy', 'avtopesh', 'vecherniy-ns', 'sem-chudes', 'puteshestvie', 'vinny-sd', 'massandra', 'peshery', 'solnechniy-krug', 'rayskiy-ugolok', 'yubk', 'tri-dvorca'];
+  const detailIds = ['sudak-ns', 'automorskoy', 'avtopesh', 'vecherniy-ns', 'sem-chudes', 'puteshestvie', 'vinny-sd', 'massandra', 'peshery', 'solnechniy-krug', 'rayskiy-ugolok', 'yubk', 'tri-dvorca', 'krymskie-maldivy', 'kimmeriyskie-berega', 'sakralny-krym', 'zavtrak-u-zufara'];
   excursions.sort((a, b) => {
     const ai = detailIds.indexOf(a.id);
     const bi = detailIds.indexOf(b.id);
@@ -848,7 +998,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return a.title.localeCompare(b.title);
   });
 
-  // Рендерим кнопки в шторке
+  // Рендерим кнопки в левой шторке
   let btnHtml = '';
   excursions.forEach(e => { btnHtml += renderButton(e); });
   drawerList.insertAdjacentHTML('beforeend', btnHtml);
@@ -858,16 +1008,50 @@ document.addEventListener('DOMContentLoaded', function() {
   excursions.forEach(e => { cardHtml += renderCard(e); });
   content.insertAdjacentHTML('beforeend', cardHtml);
 
-  // Бургер — открыть шторку
-  document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
+  // Рендерим кнопки категорий в правой шторке
+  const categories = [
+    { cat: 'all', label: '🏁 Все' },
+    { cat: 'yugo-vostok', label: '🌊 Юго-Восток' },
+    { cat: 'obzornye', label: '🌄 Обзорные' },
+    { cat: 'dvortsy', label: '🏰 Дворцы & ЮБК' },
+    { cat: 'aktiv', label: '🏔 Активные' },
+    { cat: 'peshery', label: '🕯️ Пещеры' },
+    { cat: 'vinnye', label: '🍷 Винные' },
+    { cat: 'palomnicheskie', label: '⛪ Паломнические' },
+    { cat: 'zapad', label: '🏖 Западный Крым' },
+    { cat: 'sevastopol', label: '⚓ Севастополь' },
+    { cat: 'kerch', label: '🏛 Керчь' },
+    { cat: 'semejnye', label: '🐾 Семейные' },
+    { cat: 'fototur', label: '📸 Фототуры' }
+  ];
+  let catHtml = '';
+  categories.forEach(c => {
+    catHtml += `<button class="cat-filter-btn ${c.cat === 'all' ? 'active' : ''}" data-cat="${c.cat}">${c.label}</button>`;
+  });
+  drawerCatList.insertAdjacentHTML('beforeend', catHtml);
 
-  // Оверлей — закрыть шторку
+  // Текущий фильтр
+  let currentCat = 'all';
+
+  // Левая кнопка-бургер — открыть левую шторку
+  document.getElementById('hamburgerLeft').addEventListener('click', openDrawer);
+
+  // Правая кнопка-бургер — открыть правую шторку
+  document.getElementById('hamburgerRight').addEventListener('click', openDrawerRight);
+
+  // Оверлей левой шторки — закрыть
   document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
 
-  // Крестик — закрыть шторку
+  // Оверлей правой шторки — закрыть
+  document.getElementById('drawerOverlayRight').addEventListener('click', closeDrawerRight);
+
+  // Крестик левой шторки — закрыть
   document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
 
-  // Клик по кнопке в шторке
+  // Крестик правой шторки — закрыть
+  document.getElementById('drawerCloseRightBtn').addEventListener('click', closeDrawerRight);
+
+  // Клик по кнопке в левой шторке
   document.querySelectorAll('.drawer-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const id = this.dataset.id;
@@ -890,14 +1074,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Фильтр по категориям
-  document.querySelectorAll('#catNav button').forEach(btn => {
+  // Фильтр по категориям (правая шторка)
+  document.querySelectorAll('.cat-filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const cat = this.dataset.cat;
+      currentCat = cat;
 
-      document.querySelectorAll('#catNav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
 
+      // Фильтруем кнопки в левой шторке
       document.querySelectorAll('.drawer-btn').forEach(b => {
         if (cat === 'all' || b.dataset.cat === cat) {
           b.style.display = 'block';
@@ -906,12 +1092,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
 
+      // Если активная экскурсия скрыта фильтром — сбрасываем
       const activeBtn = document.querySelector('.drawer-btn.active');
       if (activeBtn && activeBtn.style.display === 'none') {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
         placeholder.style.display = 'block';
         document.querySelectorAll('.drawer-btn').forEach(b => b.classList.remove('active'));
       }
+
+      closeDrawerRight();
     });
   });
 
