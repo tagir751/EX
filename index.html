@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -50,36 +51,65 @@ body {
 .cat-nav button:hover { border-color: #1a3a5c; color: #1a3a5c; }
 .cat-nav button.active { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
 
-/* ===== MAIN: SIDEBAR + CONTENT ===== */
-.main { display: flex; gap: 28px; padding-top: 24px; padding-bottom: 60px; align-items: flex-start; }
+/* ===== КНОПКА-БУРГЕР (слева) ===== */
+.hamburger {
+  position: fixed; left: 16px; top: 50%; transform: translateY(-50%); z-index: 100;
+  width: 48px; height: 48px; border-radius: 50%; border: none;
+  background: #1a3a5c; color: #fff; font-size: 20px; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(26,58,92,0.35);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hamburger:hover { transform: translateY(-50%) scale(1.08); box-shadow: 0 6px 20px rgba(26,58,92,0.45); }
+.hamburger:active { transform: translateY(-50%) scale(0.95); }
 
-/* ===== SIDEBAR (кнопки экскурсий) ===== */
-.sidebar {
-  flex: 0 0 280px; position: sticky; top: 62px; max-height: calc(100vh - 80px); overflow-y: auto;
-  background: #fff; border-radius: 10px; border: 1px solid #e8e0d6; padding: 14px 10px;
+/* ===== ШТОРКА (drawer) ===== */
+.drawer-overlay {
+  position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35);
+  opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s;
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-.sidebar-title {
-  font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #999;
-  padding: 0 8px 8px; border-bottom: 1px solid #eee; margin-bottom: 6px;
+.drawer-overlay.open { opacity: 1; visibility: visible; }
+
+.drawer {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 201;
+  width: 320px; max-width: 85vw;
+  background: #fff; box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex; flex-direction: column;
 }
-.sidebar button {
+.drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 16px 12px; border-bottom: 1px solid #eee; flex-shrink: 0;
+}
+.drawer-header h2 { font-size: 17px; font-weight: 700; color: #1a3a5c; }
+.drawer-close {
+  background: none; border: none; font-size: 22px; cursor: pointer; color: #999; padding: 4px;
+  line-height: 1;
+}
+.drawer-close:hover { color: #333; }
+
+.drawer-list {
+  flex: 1; overflow-y: auto; padding: 8px 10px;
+}
+.drawer-list::-webkit-scrollbar { width: 4px; }
+.drawer-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+.drawer-list button {
   display: block; width: 100%; text-align: left; background: transparent; border: none;
-  border-radius: 6px; padding: 8px 10px; font-size: 13px; cursor: pointer; color: #333;
+  border-radius: 6px; padding: 10px 12px; font-size: 13.5px; cursor: pointer; color: #333;
   transition: all 0.12s; line-height: 1.3;
 }
-.sidebar button:hover { background: #f0ebe4; }
-.sidebar button.active { background: #e8f0f7; color: #1a3a5c; font-weight: 600; }
-.sidebar button .cat-tag {
+.drawer-list button:hover { background: #f0ebe4; }
+.drawer-list button.active { background: #e8f0f7; color: #1a3a5c; font-weight: 600; }
+.drawer-list button .cat-tag {
   display: inline-block; font-size: 10px; background: #eee; color: #777; border-radius: 4px;
   padding: 1px 6px; margin-left: 4px;
 }
 
 /* ===== CONTENT ===== */
-.content {
-  flex: 1; min-width: 0;
-}
+.main { padding-top: 24px; padding-bottom: 60px; }
 .content-placeholder {
   background: #fff; border-radius: 10px; border: 1px solid #e8e0d6; padding: 80px 40px; text-align: center;
   color: #aaa; font-size: 16px;
@@ -120,8 +150,8 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .main { flex-direction: column; }
-  .sidebar { flex: none; width: 100%; position: static; max-height: none; }
+  .hamburger { left: 10px; width: 42px; height: 42px; font-size: 17px; }
+  .drawer { width: 85vw; }
   .card { padding: 20px; }
   .header .wrap { flex-direction: column; text-align: center; }
 }
@@ -140,7 +170,7 @@ body {
   </div>
 </div>
 
-<!-- ===== КАТЕГОРИИ (навигация) ===== -->
+<!-- ===== КАТЕГОРИИ ===== -->
 <div class="cat-nav" id="catNav">
   <div class="wrap">
     <button class="active" data-cat="all">🏁 Все</button>
@@ -159,24 +189,25 @@ body {
   </div>
 </div>
 
+<!-- ===== КНОПКА-БУРГЕР ===== -->
+<button class="hamburger" id="hamburgerBtn" title="Список экскурсий">☰</button>
+
+<!-- ===== ШТОРКА ===== -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2>📋 Экскурсии</h2>
+    <button class="drawer-close" id="drawerCloseBtn">✕</button>
+  </div>
+  <div class="drawer-list" id="drawerList"></div>
+</div>
+
 <!-- ===== MAIN ===== -->
-<div class="main wrap">
-
-  <!-- SIDEBAR (кнопки экскурсий) -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-title">📋 Экскурсии</div>
-    <!-- кнопки генерируются JS -->
+<div class="main wrap" id="content">
+  <div class="content-placeholder" id="placeholder">
+    <div style="font-size: 48px; margin-bottom: 16px;">👆</div>
+    <strong>Выберите экскурсию</strong> из списка слева,<br>чтобы увидеть полное описание, фишки и рекомендации
   </div>
-
-  <!-- CONTENT (описание) -->
-  <div class="content" id="content">
-    <div class="content-placeholder" id="placeholder">
-      <div style="font-size: 48px; margin-bottom: 16px;">👆</div>
-      <strong>Выберите экскурсию</strong> из списка слева,<br>чтобы увидеть полное описание, фишки и рекомендации
-    </div>
-    <!-- карточки генерируются JS -->
-  </div>
-
 </div>
 
 <script>
@@ -580,6 +611,165 @@ add('sudak-ns', 'Судак — Новый Свет (Тропа + Крепост
 </ul>`
 });
 
+// ===== ДОПОЛНИТЕЛЬНЫЕ ЭКСКУРСИИ (из Вареновой) =====
+
+add('solnechniy-krug', 'Солнечный круг', 'obzornye', '☀️', {
+  time: '⏰ 07:00–22:00 (~15 ч)',
+  price: '💰 500₽ (допы: вход в храм-маяк, теплоход)',
+  type: '🌄 Обзорная · Природная',
+  desc: `<p>Большое путешествие через весь Южный берег Крыма от Феодосии до Фороса и обратно. За один день — легендарные серпантины Судак — Алушта, потухший вулкан Карадаг со стороны Коктебельской долины, гора Узун-Сырт с ротондой «Звёздопад воспоминаний», село Морское с памятником Виктору Цою, белоснежный храм-маяк Николая Чудотворца в Малореченском, лучшие пляжи Профессорского уголка в Алуште, набережная Ялты, теплоход мимо Ласточкиного гнезда, парк Кузнецова в Форосе и купание на новых отсыпанных пляжах. Обратный путь — через Ласпинский перевал и трассу Таврида.</p>`,
+
+  why: `<p><strong>4 купания за один день.</strong> Человек не теряет время — он не только смотрит природу, но и купается. Час на каждое купание — переодеться, поплавать, освежиться и ехать дальше.</p>
+<p><strong>Весь Южный берег Крыма за день.</strong> Огромный маршрут: от Феодосии через Судак, Морское, Малореченское, Алушту, Ялту до Фороса и обратно через Ласпинский перевал.</p>
+<p><strong>Уникальные локации.</strong> Гора Узун-Сырт (колыбель авиации), храм-маяк на обрыве, гитара Виктора Цоя, Ласточкино гнездо с моря, парк Кузнецова с озёрами.</p>
+<p><strong>Морская прогулка на теплоходе.</strong> Финальный аккорд — часовая прогулка вдоль побережья с видом на Ласточкино гнездо с воды.</p>`,
+
+  hooks: `<ol>
+<li><strong>«Звёздопад воспоминаний» на Узун-Сырт.</strong> Панорама Коктебельской долины и потухшего вулкана.</li>
+<li><strong>Гитара Виктора Цоя.</strong> Памятник в селе Морском. Группа «Кино» отсюда родом. Внимание: в 2025–2026 гитару временно убрали из-за строительства моста.</li>
+<li><strong>Храм-маяк Николая Чудотворца.</strong> Белоснежный храм на краю обрыва над морем. Можно зайти внутрь.</li>
+<li><strong>Серпантины Судак — Алушта.</strong> Одна из самых живописных дорог Крыма.</li>
+<li><strong>Профессорский уголок.</strong> Западная часть Алушты — самые лучшие пляжи.</li>
+<li><strong>Ласточкино гнездо с моря.</strong> Никто не идёт пешком — смотрят с теплохода, самый красивый ракурс.</li>
+<li><strong>Форос — самый южный посёлок Крыма.</strong> Парк Кузнецова с озёрами. Новые отсыпанные пляжи — чистая вода.</li>
+<li><strong>Ласпинский перевал.</strong> Выезд на Тавриду — финальная красивая точка перед возвращением.</li>
+</ol>`,
+
+  sell: `<blockquote>«Хотите увидеть весь Южный берег Крыма за один день? "Солнечный круг" — 15 часов солнца, моря и гор. Узун-Сырт с панорамой вулкана, храм-маяк на обрыве, гитара Цоя, Алушта, Ялта, теплоход мимо Ласточкиного гнезда, купание в Форосе. И главное — целых четыре купания! Вы не просто смотрите — вы отдыхаете. Берите купальник, воду, хорошее настроение — и целый день в подарок».</blockquote>`,
+
+  tourist: `<ul>
+<li>🧢 Обязательно вода — день долгий и жаркий.</li>
+<li>🩱 Купальник и полотенце — 4 купания.</li>
+<li>🥾 Удобная обувь — подъём на Узун-Сырт.</li>
+<li>🧴 Солнцезащитный крем — весь день на солнце.</li>
+<li>💰 Наличные на допы: храм-маяк, теплоход.</li>
+<li>🍫 Перекус с собой — маршрут длинный.</li>
+<li>🚐 Выезд в 7:00 от ДОФА, с Приморского в 6:00.</li>
+<li>📱 Возвращение ~22:00–23:00 — предупредить родных.</li>
+</ul>`,
+
+  org: `<ul>
+<li>🚐 Выезд от ДОФА в 7:00, с Приморского в 6:00. Возврат ~22:00–23:00.</li>
+<li>🚧 Между Судаком и Алуштой строят мост — возможны изменения.</li>
+<li>🏊 4 купания: Морское, Алушта (Профессорский уголок), Форос.</li>
+<li>🚢 Теплоход в Ялте — опция, не входит в стоимость. Ласточку смотрят с воды, пешком не идут.</li>
+<li>🗣️ Продавать как «целый день впечатлений» — клиент должен понимать насыщенность.</li>
+</ul>`
+});
+
+add('rayskiy-ugolok', 'Райский уголок (Большая Ялта)', 'dvortsy', '🌿', {
+  time: '⏰ 12–13 часов',
+  price: '💰 500₽ + допы на входы',
+  type: '🏰 Обзорная · Дворцы и парки',
+  desc: `<p>Экскурсия-комбайн по всему Южному берегу: парк Айвазовского в Партените, Ливадийский дворец, Ласточкино гнездо и набережная Ялты. Главная жемчужина — парк Айвазовского с японским садом «Шесть чувств», греческим садом, уникальными растениями и водоёмами. Ливадийский дворец с экскурсией (час), обед в кафе «Ирпан» над Ласточкой, пеший спуск к замку (крутой подъём обратно), вечерняя прогулка по Ялте.</p>`,
+
+  why: `<p><strong>Всё главное ЮБК за один день.</strong> Парк Айвазовского, Ливадийский дворец, Ласточкино гнездо, Ялта.</p>
+<p><strong>Парк Айвазовского — эксклюзив.</strong> Японский сад «Шесть чувств» — аналогов в Крыму нет. Философские зоны, редкие растения.</p>
+<p><strong>Ласточкино гнездо вблизи.</strong> Не с обзорной, а зайти внутрь, на 40-метровую скалу.</p>
+<p><strong>Ливадийский дворец — живая история.</strong> Ялтинская конференция 1945, царские интерьеры.</p>`,
+
+  hooks: `<ol>
+<li><strong>Японский сад «Шесть чувств»</strong> — философская прогулка, задействованы все органы чувств.</li>
+<li><strong>Парк Айвазовского — музей под открытым небом.</strong> Уникальные растения, скульптуры, водоёмы.</li>
+<li><strong>Ливадийский дворец.</strong> Здесь в 1945 Сталин, Рузвельт и Черчилль решали судьбу мира.</li>
+<li><strong>Ласточкино гнездо с теплохода.</strong> Самый узнаваемый вид Крыма.</li>
+<li><strong>Храм Архистратига Михаила</strong> в Ореанде — смотровая площадка с панорамой.</li>
+<li><strong>Греческий сад</strong> в парке Айвазовского — кипарисы, античные мотивы.</li>
+</ol>`,
+
+  sell: `<blockquote>«Хотите за один день увидеть всё лучшее на ЮБК? Парк Айвазовского с японским садом — такой красоты вы нигде больше не найдёте. Ливадийский дворец, где решалась судьба мира. Ласточкино гнездо — замок на скале над морем. Ялта с её набережной. Всё самое главное — без гонки, со свободным временем».</blockquote>`,
+
+  tourist: `<ul>
+<li>🚶 Ходить очень много. Парк Айвазовского огромен. Удобная обувь обязательна.</li>
+<li>🩴 Возьмите лёгкие тапочки/босоножки для парка.</li>
+<li>🥾 Ласточка — крутой спуск и подъём. Если проблемы с ногами — остаться наверху.</li>
+<li>🎒 Предупредите: если проблемы с ногами — это не их экскурсия.</li>
+</ul>`,
+
+  org: `<ul>
+<li>Маршрут перегружен: парк + Ливадия + Ласточка + Ялта. Гиды считают Ливадию лишней.</li>
+<li>🎯 Если клиент хочет спокойной прогулки — предложите другую.</li>
+<li>🏗️ У Ласточки стройка (отель Рутенберга) — краны, вид временно неидеальный.</li>
+<li>🎫 Вход в Ласточку 200–300₽. Внутри маленькие комнаты — многие разочарованы.</li>
+</ul>`
+});
+
+add('yubk', 'ЮБК: дворцы и парки (Классика)', 'dvortsy', '🏰', {
+  time: '⏰ 15 часов',
+  price: '💰 500₽ + допы (Воронцовский парк ~200₽, Ласточка)',
+  type: '🏰 Обзорная · Дворцы и парки',
+  desc: `<p>Классика ЮБК, проверенная десятилетиями: Алупка → Никитский ботанический сад → Ласточкино гнездо → Ялта. Воронцовский дворец в стиле неоготики с английским ландшафтным парком (озёра, лебеди), Никитский ботанический сад (28 тыс. видов растений, «лечим лёгкие»), Ласточкино гнездо пешком прямо к зданию, набережная Ялты, морская прогулка на теплоходе, канатная дорога.</p>`,
+
+  why: `<p><strong>Классика советских времён.</strong> Маршрут, который все знают и хотят показать детям.</p>
+<p><strong>Четыре знаковых места.</strong> Никитский сад, Воронцовский дворец, Ласточка, Ялта. Ничего лишнего.</p>
+<p><strong>Природа и архитектура.</strong> Ботсад для здоровья, парк для красоты, замок для восторга.</p>
+<p><strong>Воронцовский парк — отдельный восторг.</strong> Туристы часто говорят: «Зачем мы были в Никитском, когда тут такая красота».</p>`,
+
+  hooks: `<ol>
+<li><strong>Никитский ботанический сад</strong> — основан в 1812, 28 тыс. видов. «Дышим глубоко, лечим лёгкие» среди хвойных.</li>
+<li><strong>Воронцовский дворец</strong> — неоготика, английский парк. Лебеди (5 птенцов в этом году).</li>
+<li><strong>Львиная терраса</strong> — теперь только в составе экскурсии. «Мы ж такую даль ехали».</li>
+<li><strong>Ласточкино гнездо</strong> — подходим прямо к зданию, 20–25 минут пешком.</li>
+<li><strong>Канатная дорога «Ялта — Горка»</strong> — по желанию, панорамный вид.</li>
+</ol>`,
+
+  sell: `<blockquote>«Хотите за день увидеть всё знаменитое на ЮБК? Никитский ботанический сад — 28 тысяч растений, дышим лечим лёгкие. Воронцовский — неоготика, английский парк, лебеди. Ласточкино гнездо на скале — подходим прямо к замку. Ялта — набережная, теплоход, канатка. Классика, которая не стареет».</blockquote>`,
+
+  tourist: `<ul>
+<li>🥾 Удобная обувь — много ходьбы.</li>
+<li>💧 Вода — день 15 часов.</li>
+<li>🧢 Шапочка в солнечную погоду.</li>
+<li>👛 Документы на льготы: многодетные, пенсионеры, СВО.</li>
+<li>💰 Наличные на допы: парк ~200₽, дворец, канатка, теплоход.</li>
+</ul>`,
+
+  org: `<ul>
+<li>Долгий день — 15 ч, выезд в 7 утра, возврат 22–23.</li>
+<li>🚶 Стоянка у Воронцовского далеко от входа — идти через Алупку.</li>
+<li>🏛️ Воронцовский парк ~200₽. Дворец по желанию.</li>
+<li>🌿 Никитский сад 1,5–2 часа — экскурсовод ботсада.</li>
+</ul>`
+});
+
+add('tri-dvorca', 'Три дворца (Корона ЮБК)', 'dvortsy', '👑', {
+  time: '⏰ ~14 часов',
+  price: '💰 500₽ + входные в дворцы',
+  type: '🏰 Дворцы и парки',
+  desc: `<p>Три главных дворца ЮБК за один день: Массандровский (Александр III, «пряничный домик», самый высокогорный), Ливадийский (Николай II, Ялтинская конференция 1945, белоснежный), Воронцовский (неоготика, мавританский стиль, Львиная терраса). Плюс парки: Ливадийский и Воронцовский с лебедями. Каждый дворец — отдельная эпоха, стиль и история.</p>`,
+
+  why: `<p><strong>За день — три дворца.</strong> Три эпохи, три стиля, три истории. Экономия времени и денег.</p>
+<p><strong>Массандра — «царская дача-секрет».</strong> До 90-х о ней мало кто знал. Подлинные интерьеры, второй этаж открыт.</p>
+<p><strong>Ливадия — место «Большой тройки».</strong> Сталин, Черчилль, Рузвельт. Пройти по тем же залам.</p>
+<p><strong>Воронцовский — самый узнаваемый.</strong> Сказочная неоготика, Львиная терраса, лебеди в парке.</p>`,
+
+  hooks: `<ol>
+<li><strong>Массандра — «секретная дача».</strong> До 90-х госдача, закрытая для всех. Туристы — первооткрыватели.</li>
+<li><strong>Электрокар за 200₽.</strong> Для пожилых — забота.</li>
+<li><strong>Ливадийский — «где Сталин, Черчилль и Рузвельт».</strong> Самый сильный исторический триггер.</li>
+<li><strong>Воронцовский — «самый узнаваемый».</strong> Львиная терраса, минареты, резные трубы.</li>
+<li><strong>Лебеди.</strong> Для семей с детьми и романтиков.</li>
+<li><strong>«Невозможно сравнивать».</strong> Каждый — отдельная вселенная.</li>
+</ol>`,
+
+  sell: `<blockquote>«Три дворца за один день — и все разные. Массандра — «пряничный домик» Александра III, до 90-х секретная госдача. Ливадийский — белоснежный, Ялтинская конференция, те самые залы. Воронцовский — самый узнаваемый, с Львиной террасой и лебедями. Каждый — отдельная эпоха. За день проживёте полтора века русской истории».</blockquote>`,
+
+  tourist: `<ul>
+<li>🥾 Удобная обувь. В Массандре подъём в гору (электрокар 200₽).</li>
+<li>📄 Документы на льготы — многодетные, пенсионеры, СВО.</li>
+<li>☀️ Головной убор — весь день на воздухе.</li>
+<li>📸 Заряженный телефон — десятки фотографий.</li>
+<li>🎒 Вода и перекус — день долгий.</li>
+</ul>`,
+
+  org: `<ul>
+<li>Порядок: Массандра → обед → Ливадийский → Воронцовский.</li>
+<li>🎫 Ливадийский — строгая запись заранее.</li>
+<li>⚔️ На дворцы большой спрос — очереди в сезон.</li>
+<li>🏔️ Три дворца подряд тяжело — предупреждать.</li>
+<li>🌺 В Массандре фото без вспышки.</li>
+</ul>`
+});
+
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 
 function esc(t) {
@@ -625,19 +815,30 @@ function renderButton(e) {
     'kerch': '🏛Керчь', 'semejnye': '🐾Семья', 'fototur': '📸Фото'
   };
   const tag = catNames[e.cat] || '';
-  return `<button class="sidebar-btn" data-id="${e.id}" data-cat="${e.cat}">${e.emoji} ${esc(e.title)} ${tag ? `<span class="cat-tag">${tag}</span>` : ''}</button>`;
+  return `<button class="drawer-btn" data-id="${e.id}" data-cat="${e.cat}">${e.emoji} ${esc(e.title)} ${tag ? `<span class="cat-tag">${tag}</span>` : ''}</button>`;
+}
+
+// ===== УПРАВЛЕНИЕ ШТОРКОЙ =====
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-  const sidebar = document.getElementById('sidebar');
+  const drawerList = document.getElementById('drawerList');
   const content = document.getElementById('content');
   const placeholder = document.getElementById('placeholder');
 
-  // Сортируем: сначала наши детальные, потом остальные
-  const detailIds = ['sudak-ns', 'automorskoy', 'avtopesh', 'vecherniy-ns', 'sem-chudes', 'puteshestvie', 'vinny-sd', 'massandra', 'peshery'];
-
-  // Рендерим кнопки
+  // Сортируем
+  const detailIds = ['sudak-ns', 'automorskoy', 'avtopesh', 'vecherniy-ns', 'sem-chudes', 'puteshestvie', 'vinny-sd', 'massandra', 'peshery', 'solnechniy-krug', 'rayskiy-ugolok', 'yubk', 'tri-dvorca'];
   excursions.sort((a, b) => {
     const ai = detailIds.indexOf(a.id);
     const bi = detailIds.indexOf(b.id);
@@ -647,21 +848,31 @@ document.addEventListener('DOMContentLoaded', function() {
     return a.title.localeCompare(b.title);
   });
 
+  // Рендерим кнопки в шторке
   let btnHtml = '';
   excursions.forEach(e => { btnHtml += renderButton(e); });
-  sidebar.insertAdjacentHTML('beforeend', btnHtml);
+  drawerList.insertAdjacentHTML('beforeend', btnHtml);
 
   // Рендерим карточки
   let cardHtml = '';
   excursions.forEach(e => { cardHtml += renderCard(e); });
   content.insertAdjacentHTML('beforeend', cardHtml);
 
-  // Клик по кнопке
-  document.querySelectorAll('.sidebar-btn').forEach(btn => {
+  // Бургер — открыть шторку
+  document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
+
+  // Оверлей — закрыть шторку
+  document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+
+  // Крестик — закрыть шторку
+  document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+
+  // Клик по кнопке в шторке
+  document.querySelectorAll('.drawer-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const id = this.dataset.id;
 
-      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.drawer-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
 
       document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
@@ -670,11 +881,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const card = document.getElementById('card-' + id);
       if (card) {
         card.classList.add('visible');
-        // скролл к карточке на мобильных
         if (window.innerWidth <= 900) {
           card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
+
+      closeDrawer();
     });
   });
 
@@ -686,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('#catNav button').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
 
-      document.querySelectorAll('.sidebar-btn').forEach(b => {
+      document.querySelectorAll('.drawer-btn').forEach(b => {
         if (cat === 'all' || b.dataset.cat === cat) {
           b.style.display = 'block';
         } else {
@@ -694,18 +906,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
 
-      // Если активная карточка не видна — показываем плейсхолдер
-      const activeBtn = document.querySelector('.sidebar-btn.active');
+      const activeBtn = document.querySelector('.drawer-btn.active');
       if (activeBtn && activeBtn.style.display === 'none') {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
         placeholder.style.display = 'block';
-        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.drawer-btn').forEach(b => b.classList.remove('active'));
       }
     });
   });
 
   // Открываем первую по умолчанию
-  const firstBtn = document.querySelector('.sidebar-btn');
+  const firstBtn = document.querySelector('.drawer-btn');
   if (firstBtn) firstBtn.click();
 });
 </script>
